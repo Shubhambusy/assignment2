@@ -1,0 +1,10 @@
+* Design a system that replicates a working of a banking system.
+ It will contain multiple banks  a customer can open a savings account, joint account 
+ can view his account, transactions 
+ a customer can perform various actions such as deposit and withdraw cash,etc 
+
+        * List all the features
+        * Design a database ER diagram 
+        * list all the APIs
+
+        * Implement all APIs
