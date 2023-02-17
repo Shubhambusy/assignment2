@@ -5,13 +5,14 @@ import (
 	"apiass/entity"
 	"errors"
 	"fmt"
+	"time"
 )
 
 type AccountService interface {
-	Save(account entity.Account) entity.Account
-	Update(account entity.Account) (entity.Account, error)
-	Find(Id int64) (entity.Account, error)
-	Delete(Id int64) error
+	Save(bankID int64, isJoint bool) (entity.Account, error)
+	MapAccountCustomer(accountId int64, customerId int64)
+	Find(Number int64) (entity.Account, error)
+	Delete(Number int64) error
 }
 
 type accountService struct{}
@@ -20,23 +21,27 @@ func NewAccountService() AccountService {
 	return &accountService{}
 }
 
-func (service *accountService) Save(account entity.Account) entity.Account {
+func (service *accountService) Save(bankId int64, isJoint bool) (entity.Account, error) {
+
+	var account entity.Account
+	account.Bank_id = bankId
+	account.OpeningDate = time.Now()
+	account.JointAcccount = isJoint
+
 	_, err := db.Database.Model(&account).Returning("*").Insert()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(account)
-	// service.accounts = append(service.accounts, account)
-	return account
+	return account, nil
 }
 
-func (service *accountService) Find(Id int64) (entity.Account, error) {
+func (service *accountService) Find(Number int64) (entity.Account, error) {
 	var account entity.Account
-	err := db.Database.Model(&account).Where("account.id = ?", Id).Select()
+	err := db.Database.Model(&account).Where("account.number = ?", Number).Select()
 	if err != nil {
 		if err.Error() == "pg: no rows in result set" {
-			err = errors.New("No account found with given Id")
+			err = errors.New("No account found with given Account Number")
 			return account, err
 		}
 		panic(err)
@@ -44,32 +49,27 @@ func (service *accountService) Find(Id int64) (entity.Account, error) {
 	return account, nil
 }
 
-func (service *accountService) Update(account entity.Account) (entity.Account, error) {
-	res, err := db.Database.Model(&account).Returning("*").WherePK().Update()
-	fmt.Println(res)
-	if err != nil {
-		if err.Error() == "pg: no rows in result set" {
-			err = errors.New("No account found with given Id")
-			return account, err
-		}
-		panic(err)
-	}
-
-	fmt.Println(account)
-	// service.accounts = append(service.accounts, account)
-	return account, nil
-}
-
-func (service *accountService) Delete(Id int64) error {
+func (service *accountService) Delete(Number int64) error {
 	var account entity.Account
-	res, err := db.Database.Model(&account).Where("id = ?", Id).Returning("*").Delete()
+	res, err := db.Database.Model(&account).Where("number = ?", Number).Returning("*").Delete()
 	fmt.Println(res, account)
 	if err != nil {
 		if err.Error() == "pg: no rows in result set" {
-			err = errors.New("No account found with given Id")
+			err = errors.New("No account found with given Account Number")
 			return err
 		}
 		panic(err)
 	}
 	return nil
+}
+
+func (service *accountService)MapAccountCustomer(accountNumber int64, customerId int64) {
+	var accountCustomerMap entity.AccountCustomerMap
+	accountCustomerMap.AccountNumber = accountNumber
+	accountCustomerMap.CustomerId = customerId
+
+	_, err := db.Database.Model(&accountCustomerMap).Returning("*").Insert()
+	if err != nil {
+		panic(err)
+	}
 }

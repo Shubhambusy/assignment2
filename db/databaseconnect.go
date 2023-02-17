@@ -41,11 +41,13 @@ func createSchema(db *pg.DB) error {
 		(*entity.Account)(nil),
 		(*entity.Customer)(nil),
 		(*entity.Transaction)(nil),
+		(*entity.AccountCustomerMap)(nil),
     }
 
     for _, model := range models {
         err := db.Model(model).CreateTable(&orm.CreateTableOptions{
-            IfNotExists: true,			
+            IfNotExists: true,	
+			FKConstraints: true,	
         })
         if err != nil {
             return err
