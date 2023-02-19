@@ -25,9 +25,7 @@ func (service *customerService) Save(customer entity.Customer) entity.Customer {
     if err != nil {
         panic(err)
     }
-
-	fmt.Println(customer)
-	// service.customers = append(service.customers, customer)
+	
 	return customer
 }
 
@@ -45,7 +43,7 @@ func (service *customerService) Find(Id int64) (entity.Customer, error) {
 }
 
 func (service *customerService) Update(customer entity.Customer) (entity.Customer, error) {
-	res, err := db.Database.Model(&customer).Returning("*").WherePK().Update()
+	res, err := db.Database.Model(&customer).Returning("*").WherePK().UpdateNotZero()
 	fmt.Println(res)
     if err != nil {
 		if err.Error() == "pg: no rows in result set" {

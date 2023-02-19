@@ -13,7 +13,7 @@ var (
 	AccountController controller.AccountController = controller.NewAccountController(accountService)
 )
 
-func NewAccount(ctx *gin.Context) {	
+func NewAccount(ctx *gin.Context) {
 	account, err := AccountController.Save(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -22,7 +22,7 @@ func NewAccount(ctx *gin.Context) {
 	}
 }
 
-func NewJointAccount(ctx *gin.Context) {	
+func NewJointAccount(ctx *gin.Context) {
 	account, err := AccountController.SaveJointAccount(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,7 +40,7 @@ func ViewAccount(ctx *gin.Context) {
 	}
 }
 
-func ViewAccountTransections(ctx *gin.Context) {
+func ViewAccounttransactions(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "comming soon"})
 }
 

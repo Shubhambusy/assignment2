@@ -48,7 +48,7 @@ func (service *bankService) Find(Id int64) (entity.Bank, error) {
 }
 
 func (service *bankService) Update(bank entity.Bank) (entity.Bank, error) {
-	res, err := db.Database.Model(&bank).Returning("*").WherePK().Update()
+	res, err := db.Database.Model(&bank).Returning("*").WherePK().UpdateNotZero()
 	fmt.Println(res)
 	if err != nil {
 		if err.Error() == "pg: no rows in result set" {

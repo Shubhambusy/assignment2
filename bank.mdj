@@ -685,7 +685,7 @@
 											"top": 365,
 											"width": 314.3369140625,
 											"height": 13,
-											"text": "Transections"
+											"text": "transactions"
 										},
 										{
 											"_type": "ERDColumnCompartmentView",
@@ -2144,7 +2144,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGGScwjWM9tiKI="
 							},
-							"name": "Transections",
+							"name": "transactions",
 							"columns": [
 								{
 									"_type": "ERDColumn",
@@ -2152,7 +2152,7 @@
 									"_parent": {
 										"$ref": "AAAAAAGGS1DSf9NkdbQ="
 									},
-									"name": "Transection ID",
+									"name": "transaction ID",
 									"type": "UUID",
 									"length": 0,
 									"primaryKey": true
@@ -2196,7 +2196,7 @@
 									"_parent": {
 										"$ref": "AAAAAAGGS1DSf9NkdbQ="
 									},
-									"name": "Transection Type",
+									"name": "transaction Type",
 									"type": "VARCHAR",
 									"length": 0
 								},

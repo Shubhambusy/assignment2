@@ -25,7 +25,7 @@ func InitDB () {
 		panic(err)
 	}
 	fmt.Println("connected to database")
-
+	
 	err := createSchema(db)
 	if err != nil {
 		panic(err)
@@ -35,8 +35,8 @@ func InitDB () {
 
 // createSchema creates database schema
 func createSchema(db *pg.DB) error {
-
-    models := []interface{}{
+	
+	models := []interface{}{
         (*entity.Bank)(nil),
 		(*entity.Account)(nil),
 		(*entity.Customer)(nil),
@@ -52,8 +52,7 @@ func createSchema(db *pg.DB) error {
         if err != nil {
             return err
         }
-		fmt.Println("table created")
     }
-
+	
     return nil
 }
