@@ -31,3 +31,12 @@ func ViewTransaction(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, transaction)
 	}
 }
+
+func ViewAccountTransactions(ctx *gin.Context) {
+	transactions, err := TransactionController.FindByAccount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	} else {
+		ctx.JSON(http.StatusOK, transactions)
+	}
+}

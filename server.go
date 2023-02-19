@@ -30,12 +30,12 @@ func main() {
 	server.POST("/openAccount", routes.NewAccount)
 	server.POST("/openJointAccount", routes.NewJointAccount)
 	server.GET("/viewAccount/:number", routes.ViewAccount)
-	server.GET("/viewAccounttransactions/:number", routes.ViewAccounttransactions)
 	server.DELETE("/deleteAccount/:number", routes.DeleteAccount)
-
+	
 	// transaction routes
 	server.POST("/performTransaction", routes.PerformTransaction)
 	server.GET("/viewTransaction/:id", routes.ViewTransaction)
+	server.GET("/viewAccountTransactions/:account_number", routes.ViewAccountTransactions)
 
 	server.Run(":8080")
 

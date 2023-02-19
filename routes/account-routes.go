@@ -40,10 +40,6 @@ func ViewAccount(ctx *gin.Context) {
 	}
 }
 
-func ViewAccounttransactions(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{"message": "comming soon"})
-}
-
 func DeleteAccount(ctx *gin.Context) {
 	err := AccountController.Delete(ctx)
 	if err != nil {

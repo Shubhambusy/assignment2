@@ -7,12 +7,12 @@ import (
 )
 
 type Transaction struct {
-	Id              uuid.UUID `pg:"type:uuid"`
-	Timestamp       time.Time
-	Type            string // cash_deposit, cash_withdraw, account_transfer
-	SenderAccount   int64  // for cash transaction account number = 0
-	RecipientAcount int64  // for cash transaction account number = 0
-	Amount          float64
+	Id               uuid.UUID `pg:"type:uuid"`
+	Timestamp        time.Time
+	Type             string  // cash_deposit, cash_withdraw, account_transfer
+	SenderAccount    int64   // for cash transaction account number = 0
+	RecipientAccount int64   // for cash transaction account number = 0
+	Amount           float64 `pg:",use_zero"`
 }
 
 // transaction type can be optimized by using enum,

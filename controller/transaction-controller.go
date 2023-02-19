@@ -5,6 +5,7 @@ import (
 	"apiass/service"
 	"encoding/json"
 	"errors"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -12,6 +13,7 @@ import (
 
 type TransactionController interface {
 	Find(ctx *gin.Context) (entity.Transaction, error)
+	FindByAccount(ctx *gin.Context) ([]entity.Transaction, error)
 	Save(ctx *gin.Context) (entity.Transaction, error)
 }
 
@@ -23,6 +25,20 @@ func NewTransactionController(service service.TransactionService) TransactionCon
 	return &transactionController{
 		service: service,
 	}
+}
+
+func (c *transactionController) FindByAccount(ctx *gin.Context) ([]entity.Transaction, error) {
+	var transactions []entity.Transaction
+	accountNumber, err := strconv.ParseInt(ctx.Params.ByName("account_number"), 0, 64)
+	if err != nil {
+		return transactions, errors.New("Account Number Could not ne feched")
+	}
+	transactions, err = c.service.FindByAccount(accountNumber)
+	if err != nil {
+		return transactions, err
+	}
+	
+	return transactions, nil
 }
 
 func (c *transactionController) Find(ctx *gin.Context) (entity.Transaction, error) {
@@ -44,7 +60,7 @@ func (c *transactionController) Save(ctx *gin.Context) (entity.Transaction, erro
 	var transaction entity.Transaction
 
 	rawData, err := ctx.GetRawData()
-	if (err != nil) {
+	if err != nil {
 		return transaction, err
 	}
 	var body map[string]interface{}
@@ -54,16 +70,16 @@ func (c *transactionController) Save(ctx *gin.Context) (entity.Transaction, erro
 	}
 
 	transactionType, err := getTransactionType(body)
-	if (err != nil) {
+	if err != nil {
 		return transaction, err
 	}
-	if (transactionType == "cash_deposit" || transactionType == "cash_withdraw") {
+	if transactionType == "cash_deposit" || transactionType == "cash_withdraw" {
 		transaction, err = c.service.SaveCashTransaction(body, transactionType)
 	} else {
 		transaction, err = c.service.SaveTransferTransaction(body)
 	}
 
-	if (err != nil) {
+	if err != nil {
 		return transaction, err
 	}
 
@@ -77,7 +93,7 @@ func getTransactionType(body map[string]interface{}) (string, error) {
 		return Type, errors.New("Unable to find transaction type")
 	}
 
-	if (Type != "cash_deposit" && Type != "cash_withdraw" && Type != "account_transfer") {
+	if Type != "cash_deposit" && Type != "cash_withdraw" && Type != "account_transfer" {
 		return Type, errors.New("Transaction type should be from [ cash_deposit , cash_withdraw , account_transfer ]")
 	}
 	return Type, nil

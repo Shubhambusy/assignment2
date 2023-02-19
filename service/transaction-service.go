@@ -16,12 +16,29 @@ type TransactionService interface {
 		transactionType string) (entity.Transaction, error)
 	SaveTransferTransaction(transactionData map[string]interface{}) (entity.Transaction, error)
 	Find(Id uuid.UUID) (entity.Transaction, error)
+	FindByAccount(AccountNumber int64) ([]entity.Transaction, error)
 }
 
 type transactionService struct{}
 
 func NewTransactionService() TransactionService {
 	return &transactionService{}
+}
+
+func (service *transactionService) FindByAccount(
+	AccountNumber int64) ([]entity.Transaction, error) {
+
+	var transactions []entity.Transaction
+
+	err := db.Database.Model(&transactions).Where(
+		"transaction.sender_account = ? or transaction.recipient_account = ?",
+		 AccountNumber,
+		 AccountNumber).Select()
+	if err != nil {
+		panic(err)
+	}
+
+	return transactions, nil
 }
 
 func (service *transactionService) SaveCashTransaction(
@@ -43,11 +60,11 @@ func (service *transactionService) SaveCashTransaction(
 		return transaction, errors.New("Account Number could not be fetched")
 	}
 	if transactionType == "cash_deposit" {
-		transaction.RecipientAcount = account_number
+		transaction.RecipientAccount = account_number
 		transaction.SenderAccount = 0
 	} else if transactionType == "cash_withdraw" {
 		transaction.SenderAccount = account_number
-		transaction.RecipientAcount = 0
+		transaction.RecipientAccount = 0
 	} else {
 		panic("Transection Type was not handled properly")
 	}
@@ -81,7 +98,7 @@ func (service *transactionService) SaveTransferTransaction(
 		return transaction, errors.New("Recipient Account Number could not be fetched")
 	}
 	transaction.SenderAccount = sender_account
-	transaction.RecipientAcount = recipient_account
+	transaction.RecipientAccount = recipient_account
 
 	transaction.Timestamp = time.Now()
 
@@ -89,7 +106,7 @@ func (service *transactionService) SaveTransferTransaction(
 	if err != nil {
 		return transaction, err
 	}
-	
+
 	return transaction, nil
 }
 
@@ -111,12 +128,12 @@ func (service *transactionService) Save(
 
 	transaction.Id = uuid.New()
 
-	if (transaction.Amount < 0) {
+	if transaction.Amount < 0 {
 		err := errors.New("Amount can not be negetive")
 		return transaction, err
 	}
 	err := updateAccountBalance(transaction.SenderAccount,
-		transaction.RecipientAcount,
+		transaction.RecipientAccount,
 		transaction.Amount)
 	if err != nil {
 		return transaction, err
@@ -169,7 +186,6 @@ func updateAccountBalance(
 			panic(err)
 		}
 	}
-
 
 	if RecipientAccountNumber != 0 {
 		_, err := db.Database.Model(&recipientAccount).WherePK().Update()
