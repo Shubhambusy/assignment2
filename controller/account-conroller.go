@@ -71,7 +71,8 @@ func (c *accountController) Save(ctx *gin.Context) (entity.Account, error) {
 		return account, err
 	}
 
-	c.service.MapAccountCustomer(account.Number, createAcc.CustomerId)
+	err = c.service.MapAccountCustomer(account.Number, createAcc.CustomerId)
+
 	return account, nil
 }
 
@@ -84,14 +85,15 @@ func (c *accountController) SaveJointAccount(ctx *gin.Context) (entity.Account, 
 		return account, err
 	}
 
+
 	_, err = bankService.Find(createAcc.BankId)
 	if err != nil {
 		err = errors.New("bank_id: not found or invalid")
 		return account, err
 	}
 
-	if createAcc.CustomerIds[0] == createAcc.CustomerIds[1] ||
-		len(createAcc.CustomerIds) != 2 {
+	if len(createAcc.CustomerIds) != 2 || 
+	createAcc.CustomerIds[0] == createAcc.CustomerIds[1] {
 		err = errors.New("Exactly two DISTINCT customer_ids are required")
 		return account, err
 	}
@@ -110,7 +112,10 @@ func (c *accountController) SaveJointAccount(ctx *gin.Context) (entity.Account, 
 	}
 
 	for _, customerId := range createAcc.CustomerIds {
-		c.service.MapAccountCustomer(account.Number, customerId)
+		err = c.service.MapAccountCustomer(account.Number, customerId)
+		if (err != nil) {
+			return account, err
+		}
 	}
 	return account, nil
 }

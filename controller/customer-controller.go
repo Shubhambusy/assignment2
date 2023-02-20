@@ -45,7 +45,10 @@ func (c *customerController) Save(ctx *gin.Context) (entity.Customer, error) {
 	if (err != nil) {
 		return customer, err
 	}
-	customer = c.service.Save(customer)
+	customer, err = c.service.Save(customer)
+	if (err != nil) {
+		return  customer, err
+	}
 	return customer, nil
 }
 

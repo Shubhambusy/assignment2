@@ -2,9 +2,9 @@ package routes
 
 import (
 	"apiass/controller"
+	"apiass/helper"
 	"apiass/service"
-	"net/http"
-
+	
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,28 +15,15 @@ var (
 
 func PerformTransaction(ctx *gin.Context) {
 	transaction, err := TransactionController.Save(ctx)
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, transaction)
-	}
+	helper.HandleResponse(ctx, transaction, err)
 }
 
 func ViewTransaction(ctx *gin.Context) {
 	transaction, err := TransactionController.Find(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, transaction)
-	}
+	helper.HandleResponse(ctx, transaction, err)
 }
 
 func ViewAccountTransactions(ctx *gin.Context) {
 	transactions, err := TransactionController.FindByAccount(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, transactions)
-	}
+	helper.HandleResponse(ctx, transactions, err)
 }

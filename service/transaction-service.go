@@ -32,10 +32,12 @@ func (service *transactionService) FindByAccount(
 
 	err := db.Database.Model(&transactions).Where(
 		"transaction.sender_account = ? or transaction.recipient_account = ?",
-		 AccountNumber,
-		 AccountNumber).Select()
+		AccountNumber,
+		AccountNumber).Select()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return transactions, err
 	}
 
 	return transactions, nil
@@ -66,7 +68,9 @@ func (service *transactionService) SaveCashTransaction(
 		transaction.SenderAccount = account_number
 		transaction.RecipientAccount = 0
 	} else {
-		panic("Transection Type was not handled properly")
+		fmt.Println("Transection Type was not handled properly")
+		err := errors.New("Something went wrong")
+		return transaction, err
 	}
 
 	transaction, err := service.Save(transaction)
@@ -118,7 +122,9 @@ func (service *transactionService) Find(Id uuid.UUID) (entity.Transaction, error
 			err = errors.New("No transaction found with given Id")
 			return transaction, err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return transaction, err
 	}
 	return transaction, nil
 }
@@ -132,16 +138,40 @@ func (service *transactionService) Save(
 		err := errors.New("Amount can not be negetive")
 		return transaction, err
 	}
-	err := updateAccountBalance(transaction.SenderAccount,
-		transaction.RecipientAccount,
-		transaction.Amount)
+
+	// DB transaction STARTED
+	tx, err := db.Database.Begin()
+
+	// Make sure to close transaction if something goes wrong.
+	defer tx.Close()
+
 	if err != nil {
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
 		return transaction, err
 	}
 
-	_, err = db.Database.Model(&transaction).Returning("*").Insert()
+	err = updateAccountBalance(transaction.SenderAccount,
+		transaction.RecipientAccount,
+		transaction.Amount)
 	if err != nil {
+		// Rollback on error.
+		_ = tx.Rollback()
+		return transaction, err
+	}
+	_, err = db.Database.Model(&transaction).Returning("*").Insert()
+
+	if err != nil {
+		_ = tx.Rollback()
+
 		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return transaction, err
+	}
+
+	// DB transaction ENDED
+	// Commit on success.
+	if err := tx.Commit(); err != nil {
 		panic(err)
 	}
 
@@ -178,21 +208,22 @@ func updateAccountBalance(
 		recipientAccount.Balance = recipientAccount.Balance + Amount
 	}
 
-	fmt.Println("sender acc --", senderAccount)
-	fmt.Println("Recipient acc. -- ", recipientAccount)
 	if SenderAccountNumber != 0 {
 		_, err := db.Database.Model(&senderAccount).WherePK().Update()
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			err = errors.New("Something went wrong")
+			return err
 		}
 	}
 
 	if RecipientAccountNumber != 0 {
 		_, err := db.Database.Model(&recipientAccount).WherePK().Update()
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			err = errors.New("Something went wrong")
+			return err
 		}
 	}
-
 	return nil
 }

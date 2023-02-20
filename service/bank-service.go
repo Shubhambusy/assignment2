@@ -27,10 +27,10 @@ func (service *bankService) Save(bank entity.Bank) (entity.Bank, error) {
 			err = errors.New("Bank name Already exists")
 			return bank, err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return bank, err
 	}
-
-	fmt.Println(bank)
 	return bank, nil
 }
 
@@ -42,7 +42,9 @@ func (service *bankService) Find(Id int64) (entity.Bank, error) {
 			err = errors.New("No bank found with given Id")
 			return bank, err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return bank, err
 	}
 	return bank, nil
 }
@@ -55,7 +57,9 @@ func (service *bankService) Update(bank entity.Bank) (entity.Bank, error) {
 			err = errors.New("No bank found with given Id")
 			return bank, err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return bank, err
 	}
 
 	fmt.Println(bank)
@@ -71,7 +75,9 @@ func (service *bankService) Delete(Id int64) error {
 			err = errors.New("No bank found with given Id")
 			return err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return err
 	}
 	return nil
 }

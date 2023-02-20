@@ -2,50 +2,34 @@ package routes
 
 import (
 	"apiass/controller"
+	"apiass/helper"
 	"apiass/service"
 	_ "fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-var(
-	bankService service.BankService = service.NewBankService()
+var (
+	bankService    service.BankService       = service.NewBankService()
 	BankController controller.BankController = controller.NewBankController(bankService)
 )
 
-func NewBank (ctx *gin.Context) {
+func NewBank(ctx *gin.Context) {
 	bank, err := BankController.Save(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, bank)
-	}
+	helper.HandleResponse(ctx, bank, err)
 }
 
-func ViewBank (ctx *gin.Context) {
+func ViewBank(ctx *gin.Context) {
 	bank, err := BankController.Find(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, bank)
-	}
+	helper.HandleResponse(ctx, bank, err)
 }
 
-func UpdateBank (ctx *gin.Context) {
+func UpdateBank(ctx *gin.Context) {
 	bank, err := BankController.Update(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, bank)
-	}
+	helper.HandleResponse(ctx, bank, err)
 }
 
-func DeleteBank (ctx *gin.Context) {
+func DeleteBank(ctx *gin.Context) {
 	err := BankController.Delete(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message":"Bank deleted succesfully"})
-	}
+	helper.HandleResponse(ctx, gin.H{"message": "Bank deleted succesfully"}, err)
 }

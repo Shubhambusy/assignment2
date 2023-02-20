@@ -8,7 +8,7 @@ import (
 )
 
 type CustomerService interface {
-	Save(customer entity.Customer) entity.Customer
+	Save(customer entity.Customer) (entity.Customer, error)
 	Update(customer entity.Customer) (entity.Customer, error)
 	Find(Id int64) (entity.Customer, error)
 	Delete(Id int64) error
@@ -20,13 +20,14 @@ func NewCustomerService() CustomerService {
 	return &customerService{}
 }
 
-func (service *customerService) Save(customer entity.Customer) entity.Customer {
+func (service *customerService) Save(customer entity.Customer) (entity.Customer, error) {
 	_ , err := db.Database.Model(&customer).Returning("*").Insert()
     if err != nil {
-        panic(err)
-    }
-	
-	return customer
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return customer, err
+	}
+	return customer, nil
 }
 
 func (service *customerService) Find(Id int64) (entity.Customer, error) {
@@ -37,7 +38,9 @@ func (service *customerService) Find(Id int64) (entity.Customer, error) {
 			err = errors.New("No customer found with given Id")
 			return customer, err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return customer, err
 	}
 	return customer, nil
 }
@@ -50,7 +53,9 @@ func (service *customerService) Update(customer entity.Customer) (entity.Custome
 			err = errors.New("No customer found with given Id")
 			return customer, err
 		}
-        panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return customer, err
     }
 
 	fmt.Println(customer)
@@ -67,7 +72,9 @@ func (service *customerService) Delete(Id int64) error {
 			err = errors.New("No customer found with given Id")
 			return err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return err
 	}
 	return nil
 }

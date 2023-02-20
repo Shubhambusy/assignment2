@@ -10,7 +10,7 @@ import (
 
 type AccountService interface {
 	Save(bankID int64, isJoint bool) (entity.Account, error)
-	MapAccountCustomer(accountId int64, customerId int64)
+	MapAccountCustomer(accountId int64, customerId int64) error
 	Find(Number int64) (entity.Account, error)
 	Delete(Number int64) error
 }
@@ -30,7 +30,9 @@ func (service *accountService) Save(bankId int64, isJoint bool) (entity.Account,
 
 	_, err := db.Database.Model(&account).Returning("*").Insert()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return account, err
 	}
 
 	return account, nil
@@ -44,7 +46,9 @@ func (service *accountService) Find(Number int64) (entity.Account, error) {
 			err = errors.New("No account found with given Account Number")
 			return account, err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return account, err
 	}
 	return account, nil
 }
@@ -58,18 +62,23 @@ func (service *accountService) Delete(Number int64) error {
 			err = errors.New("No account found with given Account Number")
 			return err
 		}
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return err
 	}
 	return nil
 }
 
-func (service *accountService)MapAccountCustomer(accountNumber int64, customerId int64) {
+func (service *accountService)MapAccountCustomer(accountNumber int64, customerId int64) error {
 	var accountCustomerMap entity.AccountCustomerMap
 	accountCustomerMap.AccountNumber = accountNumber
 	accountCustomerMap.CustomerId = customerId
 
 	_, err := db.Database.Model(&accountCustomerMap).Returning("*").Insert()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		err = errors.New("Something went wrong")
+		return err
 	}
+	return nil
 }

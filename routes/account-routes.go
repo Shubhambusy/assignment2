@@ -2,8 +2,8 @@ package routes
 
 import (
 	"apiass/controller"
+	"apiass/helper"
 	"apiass/service"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,36 +15,20 @@ var (
 
 func NewAccount(ctx *gin.Context) {
 	account, err := AccountController.Save(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, account)
-	}
+	helper.HandleResponse(ctx, account, err)
 }
 
 func NewJointAccount(ctx *gin.Context) {
 	account, err := AccountController.SaveJointAccount(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, account)
-	}
+	helper.HandleResponse(ctx, account, err)
 }
 
 func ViewAccount(ctx *gin.Context) {
 	account, err := AccountController.Find(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, account)
-	}
+	helper.HandleResponse(ctx, account, err)
 }
 
 func DeleteAccount(ctx *gin.Context) {
 	err := AccountController.Delete(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "Account deleted succesfully"})
-	}
+	helper.HandleResponse(ctx, gin.H{"message": "Account deleted succesfully"}, err)
 }

@@ -2,9 +2,9 @@ package routes
 
 import (
 	"apiass/controller"
+	"apiass/helper"
 	"apiass/service"
 	_ "fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,36 +16,20 @@ var(
 
 func NewCustomer (ctx *gin.Context) {
 	customer, err := CustomerController.Save(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, customer)
-	}
+	helper.HandleResponse(ctx, customer, err)
 }
 
 func ViewCustomer (ctx *gin.Context) {
 	customer, err := CustomerController.Find(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, customer)
-	}
+	helper.HandleResponse(ctx, customer, err)
 }
 
 func UpdateCustomer (ctx *gin.Context) {
 	customer, err := CustomerController.Update(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, customer)
-	}
+	helper.HandleResponse(ctx, customer, err)
 }
 
 func DeleteCustomer (ctx *gin.Context) {
 	err := CustomerController.Delete(ctx)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message":"customer deleted succesfully"})
-	}
+	helper.HandleResponse(ctx,  gin.H{"message":"customer deleted succesfully"}, err)
 }
